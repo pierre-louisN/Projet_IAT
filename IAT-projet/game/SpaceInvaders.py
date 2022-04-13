@@ -5,7 +5,7 @@ import math
 from pygame import mixer
 import numpy as np
 import os
-
+from math import *
 
 def getURL(filename):
     return os.path.dirname(__file__) + "/" + filename
@@ -25,7 +25,7 @@ class SpaceInvaders():
     def __init__(self, display : bool = False):
         # player
         self.display = display
-        
+
         # nombre d'actions (left, right, fire, no_action)
         self.na = 4 
 
@@ -40,6 +40,11 @@ class SpaceInvaders():
         else:
             self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), flags=pygame.HIDDEN)
 
+
+        self.taille_intervalle = 50
+        self.nbre_intervalle_x= ceil(float(self.screen_width)/self.taille_intervalle)
+        self.nbre_intervalle_y = ceil(float(self.screen_height)/self.taille_intervalle)
+        self.state = [(x,y,x2) for x in range(self.nbre_intervalle_x) for y in range(self.nbre_intervalle_y) for x2 in range(self.nbre_intervalle_x)]   
         # caption and icon
         pygame.display.set_caption("Welcome to Space Invaders Game by:- styles")
 
@@ -60,10 +65,10 @@ class SpaceInvaders():
     def get_player_Y(self) -> int:
         return self.player_Y
 
-    def get_indavers_X(self) -> 'List[int]':
+    def get_invaders_X(self) -> 'List[int]':
         return self.invader_X
 
-    def get_indavers_Y(self) -> 'List[int]':
+    def get_invaders_Y(self) -> 'List[int]':
         return self.invader_Y
 
     def get_bullet_X(self) -> int:
@@ -82,17 +87,20 @@ class SpaceInvaders():
     def full_image(self):
         return pygame.surfarray.array3d(self.screen)
 
-    def get_state(self):
+    def getStates(self):
         """ A COMPLETER AVEC VOTRE ETAT
         Cette méthode doit renvoyer l'état du système comme vous aurez choisi de
         le représenter. Vous pouvez utiliser les accesseurs ci-dessus pour cela. 
         """
-        taille_intervalle = 10.0
-        nbre_intervalle_x= float(self.screen_width)/taille_intervalle
-        nbre_intervalle_y = float(self.screen_height)/taille_intervalle
+       
 
-        self.state = [None]*3   # 1 : indice de l'intervalle X de notre alien, 2 : indice de l'interballe Y de notre alien, 3 : indice de l'intervalle X de notre vaisseau 
         
+        
+        """print(self.get_invaders_X()[0])
+        self.state[0]=self.get_invaders_X()[0]/self.taille_intervalle
+        self.state[1]=self.get_invaders_Y()[0]/self.taille_intervalle
+        self.state[2]=self.get_player_X()/self.taille_intervalle"""
+
         
         
         return self.state
@@ -134,7 +142,7 @@ class SpaceInvaders():
         if self.display:
             self.render()
     
-        return self.get_state()
+        return self.getStates()
 
     def step(self, action):
         """Execute une action et renvoir l'état suivant, la récompense perçue 
@@ -209,7 +217,7 @@ class SpaceInvaders():
         if self.display:
             self.render()
     
-        return self.get_state(), reward, is_done
+        return self.getStates(), reward, is_done
 
     def render(self):
         self.show_score(self.scoreX, self.scoreY)
