@@ -63,11 +63,11 @@ class QAgent(AgentInterface):
         self.qvalues = pd.DataFrame(data={'episode': [], 'value': []})
         self.values = pd.DataFrame(data={'nx': [game.nbre_intervalle_x], 'ny': [game.nbre_intervalle_y],'x2': [game.nbre_intervalle_x]})
 
-    def learn(self, env, n_episodes, max_steps):
+    def learn(self, game, n_episodes, max_steps):
         """Cette méthode exécute l'algorithme de q-learning. 
         Il n'y a pas besoin de la modifier. Simplement la comprendre et faire le parallèle avec le cours.
-        :param env: L'environnement 
-        :type env: gym.Envselect_action
+        :param game: L'gameironnement 
+        :type game: gym.gameselect_action
         :param num_episodes: Le nombre d'épisode
         :type num_episodes: int
         :param max_num_steps: Le nombre maximum d'étape par épisode
@@ -80,14 +80,14 @@ class QAgent(AgentInterface):
         
         # Execute N episodes 
         for episode in range(n_episodes):
-            # Reinitialise l'environnement
-            state = env.reset()
+            # Reinitialise l'gameironnement
+            state = game.reset()
             # Execute K steps 
             for step in range(max_steps):
                 # Selectionne une action 
                 action = self.select_action(state)
                 # Echantillonne l'état suivant et la récompense
-                next_state, reward, terminal = env.step(action)
+                next_state, reward, terminal = game.step(action)
                 # Mets à jour la fonction de valeur Q
                 self.updateQ(state, action, reward, next_state)
                 
@@ -101,12 +101,13 @@ class QAgent(AgentInterface):
 
             # Sauvegarde et affiche les données d'apprentissage
             if n_episodes >= 0:
-                state = env.reset()
+                state = game.reset()
                 print("\r#> Ep. {}/{} Value {}".format(episode, n_episodes, self.Q[state][self.select_greedy_action(state)]), end =" ")
-                self.save_log(env, episode)
+                # Q : tableau à 4 dimensions (tuple de 3 avec un de plus pour les actions)
+                self.save_log(game, episode)
 
-        self.values.to_csv('partie_3/visualisation/logV.csv')
-        self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
+        # self.values.to_csv('partie_3/visualisation/logV.csv')
+        # self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
 
     def updateQ(self, state, action, reward, next_state):
         """À COMPLÉTER!
@@ -117,6 +118,9 @@ class QAgent(AgentInterface):
         :param reward: La récompense perçue
         :param next_state: L'état suivant
         """
+        #print("LES ETATS :", state)
+
+
         self.Q[state][action] = (1. - self.alpha) * self.Q[state][action] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state]))
 
     def select_action(self, state : 'Tuple[int, int, int]'):
@@ -131,7 +135,7 @@ class QAgent(AgentInterface):
             a = self.select_greedy_action(state)
         return a
 
-    def select_greedy_action(self, state : 'Tuple[int, int,int]'):
+    def select_greedy_action(self, state : 'Tuple[int, int, int]'):
         """
         Cette méthode retourne l'action gourmande.
         :param state: L'état courant
@@ -141,11 +145,11 @@ class QAgent(AgentInterface):
         # greedy action with random tie break
         return np.random.choice(np.where(self.Q[state] == mx)[0])
 
-    def save_log(self, env, episode):
+    def save_log(self, game, episode):
         """Sauvegarde les données d'apprentissage.
         :warning: Vous n'avez pas besoin de comprendre cette méthode
         """
-        state = env.reset()
+        state = game.reset()
         # Construit la fonction de valeur d'état associée à Q
         V = np.zeros((int(self.game.nbre_intervalle_x), int(self.game.nbre_intervalle_y),int(self.game.nbre_intervalle_x)))
         for state in self.game.getStates():
