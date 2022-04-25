@@ -5,6 +5,7 @@ import math
 from pygame import mixer
 import numpy as np
 import os
+import time
 from math import *
 
 def getURL(filename):
@@ -22,7 +23,7 @@ class SpaceInvaders():
 
     NO_INVADERS = 1 # Nombre d'aliens  
     
-    def __init__(self, display : bool = True):
+    def __init__(self, display : bool = False):
         # player
         self.display = display
 
@@ -154,7 +155,9 @@ class SpaceInvaders():
         if self.display:
             self.render()
     
-        return self.getStates()
+        #return self.getStates()
+        return self.getstate()
+
 
     def step(self, action):
         """Execute une action et renvoir l'état suivant, la récompense perçue 
@@ -200,6 +203,8 @@ class SpaceInvaders():
                     for j in range(SpaceInvaders.NO_INVADERS):
                         self.invader_Y[j] = 2000
                     is_done = True
+                    #print("GAME OVER")
+                    #time.sleep(1)
                     break
                 
             if self.invader_X[i] >= 735 or self.invader_X[i] <= 0:
@@ -228,7 +233,7 @@ class SpaceInvaders():
 
         if self.display:
             self.render()
-    
+        #time.sleep(1)
         return self.getstate(), reward, is_done
 
     def render(self):

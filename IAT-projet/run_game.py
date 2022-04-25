@@ -13,7 +13,7 @@ from controller.epsilon_profile import EpsilonProfile
 # args = parser.parse_args()
 
 # test once by taking greedy actions based on Q values
-def test_game(env: SpaceInvaders, agent: QAgent, max_steps: int, nepisodes : int = 1, speed: float = 0., same = True, display: bool = True):
+def test_game(env: SpaceInvaders, agent: QAgent, max_steps: int, nepisodes : int = 1, speed: float = 0., same = True, display: bool = False):
     n_steps = max_steps
     sum_rewards = 0.
     for _ in range(nepisodes):
@@ -43,7 +43,7 @@ def main():
     
         
     n_episodes = 200
-    max_steps = 200
+    max_steps = 10000
     gamma = 1.
     alpha = 0.2
     eps_profile = EpsilonProfile(1.0, 0.1)

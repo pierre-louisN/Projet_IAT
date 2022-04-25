@@ -1,5 +1,5 @@
 import numpy as np
-
+import time
 from game.SpaceInvaders import SpaceInvaders
 from controller.epsilon_profile import EpsilonProfile
 import pandas as pd
@@ -77,7 +77,7 @@ class QAgent(AgentInterface):
         dans un fichier de log
         """
         n_steps = np.zeros(n_episodes) + max_steps
-        
+        f = open("demofile2.txt", "w")
         # Execute N episodes 
         for episode in range(n_episodes):
             # Reinitialise l'gameironnement
@@ -88,6 +88,11 @@ class QAgent(AgentInterface):
                 action = self.select_action(state)
                 # Echantillonne l'état suivant et la récompense
                 next_state, reward, terminal = game.step(action)
+                #print("état suivant : ",next_state)
+                #print("récompense : ",reward)
+                #if(reward==1):
+                    #print("TOUCHE")
+                    #time.sleep(1)
                 # Mets à jour la fonction de valeur Q
                 self.updateQ(state, action, reward, next_state)
                 
@@ -104,10 +109,13 @@ class QAgent(AgentInterface):
                 state = game.reset()
                 print("\r#> Ep. {}/{} Value {}".format(episode, n_episodes, self.Q[state][self.select_greedy_action(state)]), end =" ")
                 # Q : tableau à 4 dimensions (tuple de 3 avec un de plus pour les actions)
+                #print("episode n° : ",episode)
                 self.save_log(game, episode)
-
-        # self.values.to_csv('partie_3/visualisation/logV.csv')
-        # self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
+            #chaine = ("Q :",self.Q,"\n")
+            f.write(str(self.Q))
+        f.close()
+        self.values.to_csv('partie_3/visualisation/logV.csv')
+        self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
 
     def updateQ(self, state, action, reward, next_state):
         """À COMPLÉTER!
@@ -120,8 +128,10 @@ class QAgent(AgentInterface):
         """
         #print("LES ETATS :", state)
 
-
+        #print("état :",state)
+        #print("action :",action)
         self.Q[state][action] = (1. - self.alpha) * self.Q[state][action] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state]))
+        # maj de tt les états possibles, l'agent va passer par un petit nombre de l'échantillon et donc très peu seront mis à 0 donc on aura pleins de 0 
 
     def select_action(self, state : 'Tuple[int, int, int]'):
         """À COMPLÉTER!
@@ -145,6 +155,7 @@ class QAgent(AgentInterface):
         # greedy action with random tie break
         return np.random.choice(np.where(self.Q[state] == mx)[0])
 
+    # assigne à chaque état une valeur, remise à jour à chaque épisode 
     def save_log(self, game, episode):
         """Sauvegarde les données d'apprentissage.
         :warning: Vous n'avez pas besoin de comprendre cette méthode
