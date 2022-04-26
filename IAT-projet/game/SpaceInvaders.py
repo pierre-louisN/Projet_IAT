@@ -42,11 +42,11 @@ class SpaceInvaders():
             self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), flags=pygame.HIDDEN)
 
 
-        self.taille_intervalle = 50
+        self.taille_intervalle = 100
         self.nbre_intervalle_x = ceil(float(self.screen_width)/self.taille_intervalle)
         self.nbre_intervalle_y = ceil(float(self.screen_height)/self.taille_intervalle)
         #Initialisation de tous les states possibles de manières ordonnées 
-        self.states = [(x,y,x_player) for x in range(self.nbre_intervalle_x) for y in range(self.nbre_intervalle_y) for x_player in range(self.nbre_intervalle_x)]  
+        self.states = [(x,y,x_player,y_bullet) for x in range(self.nbre_intervalle_x) for y in range(self.nbre_intervalle_y) for x_player in range(self.nbre_intervalle_x) for y_bullet in range(self.nbre_intervalle_y)]  
         # caption and icon
         pygame.display.set_caption("Welcome to Space Invaders Game by:- styles")
 
@@ -105,7 +105,7 @@ class SpaceInvaders():
         
         "L'état n'est pas implémenté (SpaceInvaders.get_state)"
 
-    def getstate(self) -> 'Tuple [int,int,int]':
+    def getstate(self) -> 'Tuple [int,int,int,int]':
         """ A COMPLETER AVEC VOTRE ETAT
         Cette méthode doit renvoyer l'état du système comme vous aurez choisi de
         le représenter. Vous pouvez utiliser les accesseurs ci-dessus pour cela. 
@@ -113,7 +113,10 @@ class SpaceInvaders():
         if(self.get_invaders_Y()[0] >= self.screen_height) :
             self.get_invaders_Y()[0] = self.screen_height-1
         
-        curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle))
+        if(self.get_bullet_Y() >= self.screen_height) :
+            curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle),math.floor(0/self.taille_intervalle))
+        else :
+            curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle),math.floor(self.get_bullet_Y()/self.taille_intervalle))
         #print("current state :",curr_state)
         #print("position Y de l'alien :", self.get_invaders_Y()[0])
         return curr_state
