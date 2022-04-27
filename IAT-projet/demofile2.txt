@@ -1,3 +1,0 @@
-episode n°0 --> self.Q : 3.803080577725404 & total rewards : 6
-episode n°1 --> self.Q : 10.061538725482698 & total rewards : 11
-episode n°2 --> self.Q : 11.121322839339161 & total rewards : 3

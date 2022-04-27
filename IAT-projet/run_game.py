@@ -42,7 +42,7 @@ def main():
     env =SpaceInvaders() 
     
         
-    n_episodes = 200
+    n_episodes = 1000
     max_steps = 10000
     gamma = 1.
     alpha = 0.2
@@ -51,7 +51,7 @@ def main():
     
     agent = QAgent(env, eps_profile, gamma, alpha)
     agent.learn(env, n_episodes, max_steps)
-    test_game(env, agent, max_steps, speed=0.1, display=False)
+    #test_game(env, agent, max_steps, speed=0.1, display=False)
     
 
 if __name__ == '__main__':

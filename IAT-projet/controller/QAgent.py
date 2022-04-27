@@ -83,6 +83,11 @@ class QAgent(AgentInterface):
             somme = 0
             # Reinitialise l'gameironnement
             state = game.reset()
+
+            self.game.display = False
+            if(n_episodes-(episode))/n_episodes <= 0.1 : 
+                print("Last 10%")
+                self.game.display = True
             # Execute K steps 
             for step in range(max_steps):
                 # Selectionne une action 
@@ -117,6 +122,8 @@ class QAgent(AgentInterface):
             chaine = "episode n°"+str(episode)+" --> self.Q : "+str(np.sum(self.Q))+" & total rewards : "+str(somme)+"\n"
             f.write(chaine)
 
+            
+
         f.close()
         self.values.to_csv('partie_3/visualisation/logV.csv')
         self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
@@ -135,6 +142,7 @@ class QAgent(AgentInterface):
         #print("état :",state)
         #print("action :",action)
         self.Q[state][action] = (1. - self.alpha) * self.Q[state][action] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state]))
+        
         # maj de tt les états possibles, l'agent va passer par un petit nombre de l'échantillon et donc très peu seront mis à 0 donc on aura pleins de 0 
 
     def select_action(self, state : 'Tuple[int, int, int, int]'):
