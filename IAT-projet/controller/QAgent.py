@@ -4,6 +4,7 @@ from game.SpaceInvaders import SpaceInvaders
 from controller.epsilon_profile import EpsilonProfile
 import pandas as pd
 import os
+from matplotlib import pyplot as plt
 
 
 class AgentInterface:
@@ -80,7 +81,8 @@ class QAgent(AgentInterface):
         dans un fichier de log
         """
         n_steps = np.zeros(n_episodes) + max_steps
-        
+        q_array = np.zeros(n_episodes)
+        r_array = np.zeros(n_episodes)
         # Execute N episodes 
         for episode in range(n_episodes):
             somme = 0
@@ -125,12 +127,20 @@ class QAgent(AgentInterface):
             #chaine = ("Q :",self.Q,"\n")
             #chaine = "episode n°"+str(episode)+" --> self.Q : "+str(np.sum(self.Q))+" & total rewards : "+str(somme)+"\n"
             #f.write(chaine)
+            q_array[episode]=np.sum(self.Q)
+            r_array[episode]=somme
 
             
 
         #f.close()
         self.values.to_csv('partie_3/visualisation/logV.csv')
         self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
+        plt.figure("Q sum over episodes")
+        plt.plot(q_array)
+        plt.figure("reward over episodes")
+        plt.plot(r_array)
+
+        plt.show()
 
     def updateQ(self, state, action, reward, next_state):
         """À COMPLÉTER!
@@ -148,6 +158,8 @@ class QAgent(AgentInterface):
         self.Q[state][action] = (1. - self.alpha) * self.Q[state][action] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state]))
         
         # maj de tt les états possibles, l'agent va passer par un petit nombre de l'échantillon et donc très peu seront mis à 0 donc on aura pleins de 0 
+
+    
 
     def select_action(self, state : 'Tuple[int, int, int, int]'):
         """À COMPLÉTER!

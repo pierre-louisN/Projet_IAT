@@ -45,7 +45,7 @@ def main(testing):
     
         
     n_episodes = 1000
-    max_steps = 1000
+    max_steps = 5000
     gamma = 1.
     alpha = 0.2
     eps_profile = EpsilonProfile(1.0, 0.1)
