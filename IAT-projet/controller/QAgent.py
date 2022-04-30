@@ -115,8 +115,25 @@ class QAgent(AgentInterface):
                 state = game.reset()
                 print("\r#> Ep. {}/{} Value {}".format(episode, n_episodes, self.Q[state][self.select_greedy_action(state)]), end =" ")
                 
+            q_array[episode]=np.sum(self.Q)
+            r_array[episode]=somme
+        
+        fig1 = plt.figure("Sum of Q function values over episodes")
+        plt.plot(q_array)
+        fig1.suptitle('Somme des valeurs de la fonction Q en fonction de l\'épisode ', fontsize=12)
+        plt.xlabel('Numéro d\'épisode', fontsize=8)
+        plt.ylabel('Somme des valeurs de la fonction Q', fontsize=8)
+        
+        fig2 = plt.figure("Sum of rewards over episodes")
+        
+        plt.plot(r_array)
+        fig2.suptitle('Somme des récompenses en fonction de l\'épisode ', fontsize=12)
+        plt.xlabel('Numéro d\'épisode', fontsize=8)
+        plt.ylabel('Somme des récompenses', fontsize=8)
 
-            
+        plt.show()
+
+
 
     def updateQ(self, state, action, reward, next_state):
         """À COMPLÉTER!

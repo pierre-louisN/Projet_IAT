@@ -39,7 +39,7 @@ def main(testing):
     env =SpaceInvaders() 
     
     #Hyperparamètre   
-    n_episodes = 1000
+    n_episodes = 10
     max_steps = 1000
     gamma = 0.95
     alpha = 1
@@ -54,7 +54,7 @@ def main(testing):
     else : 
         # TESTING
         agent.load_qfunction()
-        test_game(env, agent, max_steps, speed=0.0001, display=True)
+        test_game(env, agent, max_steps, speed=0., display=False)
     
 
 if __name__ == '__main__':

@@ -24,7 +24,7 @@ class SpaceInvaders():
 
     NO_INVADERS = 1 # Nombre d'aliens  
     
-    def __init__(self, display : bool = False):
+    def __init__(self, display : bool = True):
         # player
         self.display = display
 
