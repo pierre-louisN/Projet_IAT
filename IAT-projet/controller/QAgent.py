@@ -5,6 +5,8 @@ from controller.epsilon_profile import EpsilonProfile
 import pandas as pd
 import os
 import pickle
+from matplotlib import pyplot as plt
+
 
 class AgentInterface:
     """ 
@@ -78,7 +80,8 @@ class QAgent(AgentInterface):
         dans un fichier de log
         """
         n_steps = np.zeros(n_episodes) + max_steps
-        
+        q_array = np.zeros(n_episodes)
+        r_array = np.zeros(n_episodes)
         # Execute N episodes 
         for episode in range(n_episodes):
             somme = 0

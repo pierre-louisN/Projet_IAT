@@ -7,6 +7,7 @@ import numpy as np
 import os
 import time
 from math import *
+from matplotlib import pyplot as plt
 
 def getURL(filename):
     return os.path.dirname(__file__) + "/" + filename
@@ -23,7 +24,7 @@ class SpaceInvaders():
 
     NO_INVADERS = 1 # Nombre d'aliens  
     
-    def __init__(self, display : bool = True):
+    def __init__(self, display : bool = False):
         # player
         self.display = display
 
