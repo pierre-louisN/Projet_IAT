@@ -46,7 +46,7 @@ class SpaceInvaders():
         self.nbre_intervalle_x = ceil(float(self.screen_width)/self.taille_intervalle)
         self.nbre_intervalle_y = ceil(float(self.screen_height)/self.taille_intervalle)
         #Initialisation de tous les states possibles de manières ordonnées 
-        self.states = [(x,y,x_player,y_bullet) for x in range(self.nbre_intervalle_x) for y in range(self.nbre_intervalle_y) for x_player in range(self.nbre_intervalle_x) for y_bullet in range(self.nbre_intervalle_y)]  
+        self.states = [(x,y,x_player,y_bullet,b_state) for x in range(self.nbre_intervalle_x) for y in range(self.nbre_intervalle_y) for x_player in range(self.nbre_intervalle_x) for y_bullet in range(self.nbre_intervalle_y) for b_state in range(2)]  
         # caption and icon
         pygame.display.set_caption("Welcome to Space Invaders Game by:- styles")
 
@@ -94,13 +94,7 @@ class SpaceInvaders():
         Cette méthode doit renvoyer l'état du système comme vous aurez choisi de
         le représenter. Vous pouvez utiliser les accesseurs ci-dessus pour cela. 
         """
-       
-        # self.state[0]=self.get_invaders_X()[0]/self.taille_intervalle
-        # self.state[1]=self.get_invaders_Y()[0]/self.taille_intervalle
-        # self.state[2]=self.get_player_X()/self.taille_intervalle
 
-        #print("get state :",)
-        
         return self.states
         
         "L'état n'est pas implémenté (SpaceInvaders.get_state)"
@@ -110,15 +104,15 @@ class SpaceInvaders():
         Cette méthode doit renvoyer l'état du système comme vous aurez choisi de
         le représenter. Vous pouvez utiliser les accesseurs ci-dessus pour cela. 
         """
+        bulletState = 1 if self.get_bullet_state() == "rest" else 0
         if(self.get_invaders_Y()[0] >= self.screen_height) :
             self.get_invaders_Y()[0] = self.screen_height-1
         
         if(self.get_bullet_Y() >= self.screen_height) :
-            curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle),math.floor(0/self.taille_intervalle))
+            curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle),math.floor(0/self.taille_intervalle),bulletState)
         else :
-            curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle),math.floor(self.get_bullet_Y()/self.taille_intervalle))
-        #print("current state :",curr_state)
-        #print("position Y de l'alien :", self.get_invaders_Y()[0])
+            curr_state = (math.floor(self.get_invaders_X()[0]/self.taille_intervalle),math.floor(self.get_invaders_Y()[0]/self.taille_intervalle),math.floor(self.get_player_X()/self.taille_intervalle),math.floor(self.get_bullet_Y()/self.taille_intervalle),bulletState)
+
         return curr_state
         
         "L'état n'est pas implémenté (SpaceInvaders.get_state)"
@@ -206,8 +200,7 @@ class SpaceInvaders():
                     for j in range(SpaceInvaders.NO_INVADERS):
                         self.invader_Y[j] = 2000
                     is_done = True
-                    #print("GAME OVER")
-                    #time.sleep(1)
+                    print("GAME OVER")
                     break
                 
             if self.invader_X[i] >= 735 or self.invader_X[i] <= 0:
@@ -236,7 +229,6 @@ class SpaceInvaders():
 
         if self.display:
             self.render()
-        #time.sleep(1)
         return self.getstate(), reward, is_done
 
     def render(self):

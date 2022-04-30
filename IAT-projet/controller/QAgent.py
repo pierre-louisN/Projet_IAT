@@ -4,7 +4,7 @@ from game.SpaceInvaders import SpaceInvaders
 from controller.epsilon_profile import EpsilonProfile
 import pandas as pd
 import os
-
+import pickle
 
 class AgentInterface:
     """ 
@@ -49,7 +49,7 @@ class QAgent(AgentInterface):
         
         """
         # Initialise la fonction de valeur Q
-        self.Q = np.zeros([game.nbre_intervalle_x, game.nbre_intervalle_y, game.nbre_intervalle_x, game.nbre_intervalle_y, game.na])
+        self.Q = np.zeros([game.nbre_intervalle_x, game.nbre_intervalle_y, game.nbre_intervalle_x, game.nbre_intervalle_y, 2, game.na])
 
         self.game = game
         self.na = game.na
@@ -62,9 +62,7 @@ class QAgent(AgentInterface):
         self.epsilon = self.eps_profile.initial
 
         # Visualisation des données (vous n'avez pas besoin de comprendre cette partie)
-        self.qvalues = pd.DataFrame(data={'episode': [], 'value': []})
-        self.values = pd.DataFrame(data={'nx': [game.nbre_intervalle_x], 'ny': [game.nbre_intervalle_y],'x_player': [game.nbre_intervalle_x],'y_bullet': [game.nbre_intervalle_y]})
-         
+ 
 
     def learn(self, game, n_episodes, max_steps):
         """Cette méthode exécute l'algorithme de q-learning. 
@@ -88,9 +86,8 @@ class QAgent(AgentInterface):
             state = game.reset()
             
             self.game.display = False
-            #if(n_episodes-(episode))/n_episodes <= 0.1 : 
+            #display only last 3 episodes
             if(n_episodes-episode) < 3 : 
-                print("Last 10%")
                 self.game.display = True
             # Execute K steps 
             for step in range(max_steps):
@@ -98,12 +95,7 @@ class QAgent(AgentInterface):
                 action = self.select_action(state)
                 # Echantillonne l'état suivant et la récompense
                 next_state, reward, terminal = game.step(action)
-                #print("état suivant : ",next_state)
-                #print("récompense : ",reward)
                 somme += reward
-                #if(reward==1):
-                    #print("TOUCHE")
-                    #time.sleep(1)
                 # Mets à jour la fonction de valeur Q
                 self.updateQ(state, action, reward, next_state)
                 
@@ -115,22 +107,13 @@ class QAgent(AgentInterface):
             # Mets à jour la valeur du epsilon
             self.epsilon = max(self.epsilon - self.eps_profile.dec_episode / (n_episodes - 1.), self.eps_profile.final)
 
-            # Sauvegarde et affiche les données d'apprentissage
+            # affiche les données d'apprentissage
             if n_episodes >= 0:
                 state = game.reset()
                 print("\r#> Ep. {}/{} Value {}".format(episode, n_episodes, self.Q[state][self.select_greedy_action(state)]), end =" ")
-                # Q : tableau à 4 dimensions (tuple de 3 avec un de plus pour les actions)
-                #print("episode n° : ",episode)
-                self.save_log(game, episode)
-            #chaine = ("Q :",self.Q,"\n")
-            #chaine = "episode n°"+str(episode)+" --> self.Q : "+str(np.sum(self.Q))+" & total rewards : "+str(somme)+"\n"
-            #f.write(chaine)
+                
 
             
-
-        #f.close()
-        self.values.to_csv('partie_3/visualisation/logV.csv')
-        self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
 
     def updateQ(self, state, action, reward, next_state):
         """À COMPLÉTER!
@@ -141,15 +124,9 @@ class QAgent(AgentInterface):
         :param reward: La récompense perçue
         :param next_state: L'état suivant
         """
-        #print("LES ETATS :", state)
-
-        #print("état :",state)
-        #print("action :",action)
         self.Q[state][action] = (1. - self.alpha) * self.Q[state][action] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state]))
-        
-        # maj de tt les états possibles, l'agent va passer par un petit nombre de l'échantillon et donc très peu seront mis à 0 donc on aura pleins de 0 
 
-    def select_action(self, state : 'Tuple[int, int, int, int]'):
+    def select_action(self, state : 'Tuple[int, int, int, int, int]'):
         """À COMPLÉTER!
         Cette méthode retourne une action échantilloner selon le processus d'exploration (ici epsilon-greedy).
         :param state: L'état courant
@@ -161,7 +138,7 @@ class QAgent(AgentInterface):
             a = self.select_greedy_action(state)
         return a
 
-    def select_greedy_action(self, state : 'Tuple[int, int, int, int]'):
+    def select_greedy_action(self, state : 'Tuple[int, int, int, int, int]'):
         """
         Cette méthode retourne l'action gourmande.
         :param state: L'état courant
@@ -171,24 +148,13 @@ class QAgent(AgentInterface):
         # greedy action with random tie break
         return np.random.choice(np.where(self.Q[state] == mx)[0])
 
-    # assigne à chaque état une valeur, remise à jour à chaque épisode 
-    def save_log(self, game, episode):
-        """Sauvegarde les données d'apprentissage.
-        :warning: Vous n'avez pas besoin de comprendre cette méthode
-        """
-        state = game.reset()
-        # Construit la fonction de valeur d'état associée à Q
-        V = np.zeros((int(self.game.nbre_intervalle_x), int(self.game.nbre_intervalle_y), int(self.game.nbre_intervalle_x), int(self.game.nbre_intervalle_y)))
-        for state in self.game.getStates():
-            val = self.Q[state][self.select_action(state)]
-            V[state] = val
 
-        self.qvalues = self.qvalues.append({'episode': episode, 'value': self.Q[state][self.select_greedy_action(state)]}, ignore_index=True)
-        self.values = self.values.append({'episode': episode, 'value': np.reshape(V,(1, self.game.nbre_intervalle_y*self.game.nbre_intervalle_x*self.game.nbre_intervalle_x*self.game.nbre_intervalle_y))[0]},ignore_index=True)
-
+    # sauve la variable correspondant à l'apprentissage de l'agent dans un fichier 
+    def save_qfunction(self, file_name: str = "test"): 
+        fichierSauvegarde = open(file_name,"wb")
+        pickle.dump(self.Q, fichierSauvegarde)
     
-    def saveQToFile(self, file=os.path.join(os.path.dirname(__file__),'../LearnedQ/LearnedQ.npy')): 
-        np.save(file, self.Q)
-
-    def loadQFromFile(self, file=os.path.join(os.path.dirname(__file__), '../LearnedQ/LearnedQ.npy')):
-        self.Q = np.load(file)
+    # charge la variable correspondant à l'apprentissage de l'agent dans self.Q 
+    def load_qfunction(self,file_name: str = "test"):
+        fichierSauvegarde = open(file_name,"rb")
+        self.Q = pickle.load(fichierSauvegarde)
