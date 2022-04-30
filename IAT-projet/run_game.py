@@ -2,6 +2,7 @@ import sys
 import time
 from controller.QAgent import QAgent
 from game.SpaceInvaders import SpaceInvaders
+import os 
 
 from controller.epsilon_profile import EpsilonProfile
 
@@ -21,7 +22,7 @@ def test_game(env: SpaceInvaders, agent: QAgent, max_steps: int, nepisodes : int
         if display:
             env.render()
 
-        for step in range(max_steps):
+        while True :
             action = agent.select_greedy_action(state)
             next_state, reward, terminal = env.step(action)
 
@@ -32,26 +33,34 @@ def test_game(env: SpaceInvaders, agent: QAgent, max_steps: int, nepisodes : int
             sum_rewards += reward
             if terminal:
                 n_steps = step+1  # number of steps taken
+                game.game_over(game)
                 break
             state = next_state
     return n_steps, sum_rewards
 
 
-def main():
+def main(testing):
     # 
     env =SpaceInvaders() 
     
         
     n_episodes = 1000
-    max_steps = 10000
+    max_steps = 1000
     gamma = 1.
     alpha = 0.2
     eps_profile = EpsilonProfile(1.0, 0.1)
 
-    
     agent = QAgent(env, eps_profile, gamma, alpha)
-    agent.learn(env, n_episodes, max_steps)
-    #test_game(env, agent, max_steps, speed=0.1, display=False)
+    # TRAINING  
+    if (testing == "0") :  
+         # TRAINING  
+        agent.learn(env, n_episodes, max_steps)
+        fileName = "test"
+        agent.saveQToFile(os.path.join("LearnedQ", fileName))
+    else : 
+        # TESTING
+        agent.loadQFromFile(os.path.join(os.path.abspath("LearnedQ"),"test.npy"))
+        test_game(env, agent, max_steps, speed=0.5, display=False)
     
 
 if __name__ == '__main__':
@@ -60,4 +69,5 @@ if __name__ == '__main__':
     - Second argument (int) : the maze hight
     - Third argument (int) : the maze width
     """   
-    main()
+    testing = sys.argv[1]
+    main(testing)

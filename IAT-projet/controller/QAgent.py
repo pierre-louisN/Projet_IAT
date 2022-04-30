@@ -3,6 +3,8 @@ import time
 from game.SpaceInvaders import SpaceInvaders
 from controller.epsilon_profile import EpsilonProfile
 import pandas as pd
+import os
+
 
 class AgentInterface:
     """ 
@@ -62,6 +64,7 @@ class QAgent(AgentInterface):
         # Visualisation des données (vous n'avez pas besoin de comprendre cette partie)
         self.qvalues = pd.DataFrame(data={'episode': [], 'value': []})
         self.values = pd.DataFrame(data={'nx': [game.nbre_intervalle_x], 'ny': [game.nbre_intervalle_y],'x_player': [game.nbre_intervalle_x],'y_bullet': [game.nbre_intervalle_y]})
+         
 
     def learn(self, game, n_episodes, max_steps):
         """Cette méthode exécute l'algorithme de q-learning. 
@@ -77,15 +80,16 @@ class QAgent(AgentInterface):
         dans un fichier de log
         """
         n_steps = np.zeros(n_episodes) + max_steps
-        f = open("demofile2.txt", "w")
+        
         # Execute N episodes 
         for episode in range(n_episodes):
             somme = 0
             # Reinitialise l'gameironnement
             state = game.reset()
-
+            
             self.game.display = False
-            if(n_episodes-(episode))/n_episodes <= 0.1 : 
+            #if(n_episodes-(episode))/n_episodes <= 0.1 : 
+            if(n_episodes-episode) < 3 : 
                 print("Last 10%")
                 self.game.display = True
             # Execute K steps 
@@ -119,12 +123,12 @@ class QAgent(AgentInterface):
                 #print("episode n° : ",episode)
                 self.save_log(game, episode)
             #chaine = ("Q :",self.Q,"\n")
-            chaine = "episode n°"+str(episode)+" --> self.Q : "+str(np.sum(self.Q))+" & total rewards : "+str(somme)+"\n"
-            f.write(chaine)
+            #chaine = "episode n°"+str(episode)+" --> self.Q : "+str(np.sum(self.Q))+" & total rewards : "+str(somme)+"\n"
+            #f.write(chaine)
 
             
 
-        f.close()
+        #f.close()
         self.values.to_csv('partie_3/visualisation/logV.csv')
         self.qvalues.to_csv('partie_3/visualisation/logQ.csv')
 
@@ -181,3 +185,10 @@ class QAgent(AgentInterface):
 
         self.qvalues = self.qvalues.append({'episode': episode, 'value': self.Q[state][self.select_greedy_action(state)]}, ignore_index=True)
         self.values = self.values.append({'episode': episode, 'value': np.reshape(V,(1, self.game.nbre_intervalle_y*self.game.nbre_intervalle_x*self.game.nbre_intervalle_x*self.game.nbre_intervalle_y))[0]},ignore_index=True)
+
+    
+    def saveQToFile(self, file=os.path.join(os.path.dirname(__file__),'../LearnedQ/LearnedQ.npy')): 
+        np.save(file, self.Q)
+
+    def loadQFromFile(self, file=os.path.join(os.path.dirname(__file__), '../LearnedQ/LearnedQ.npy')):
+        self.Q = np.load(file)
